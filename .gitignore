@@ -1,0 +1,84 @@
+# ==============================================================================
+# 1. ENVIRONMENT & SECRETS (CRITICAL)
+# ==============================================================================
+.env
+.env.local
+.env.*
+!.env.example
+
+# ==============================================================================
+# 2. VIRTUAL ENVIRONMENTS
+# ==============================================================================
+.venv/
+venv/
+env/
+ENV/
+
+# ==============================================================================
+# 3. MACHINE LEARNING & MEDICAL DATA (LARGE FILES)
+# ==============================================================================
+# Model weights and artifacts
+models/
+checkpoints/
+*.ckpt
+*.pt
+*.pth
+*.h5
+*.onnx
+
+# Medical imaging formats
+data/
+predictions/
+*.nii
+*.nii.gz
+*.mha
+*.dcm
+
+# Experiment tracking logs
+wandb/
+mlruns/
+
+# ==============================================================================
+# 4. PYTHON CACHE & COMPILED FILES
+# ==============================================================================
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+share/python-wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# ==============================================================================
+# 5. TESTING, LINTING & COVERAGE
+# ==============================================================================
+.pytest_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+coverage.xml
+*.log
+
+# ==============================================================================
+# 6. IDEs & OS-SPECIFIC
+# ==============================================================================
+.vscode/
+.idea/
+.DS_Store
+*.swp
+*~
+Thumbs.db

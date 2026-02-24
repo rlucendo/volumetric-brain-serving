@@ -1,0 +1,44 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "neuroseg-serving"
+version = "0.1.0"
+description = "Production-ready MLOps serving pipeline for 3D Brain Tumor Segmentation"
+authors = [
+    { name = "Ruben Lucendo", email = "your.email@example.com" }
+]
+readme = "README.md"
+requires-python = ">=3.10"
+dependencies = [
+    "fastapi>=0.110.0",
+    "uvicorn[standard]>=0.29.0",
+    "pydantic>=2.6.0",
+    "pydantic-settings>=2.2.0",
+    "monai>=1.3.0",
+    "torch>=2.2.0",
+    "nibabel>=5.2.0",
+    "structlog>=24.1.0",
+    "wandb>=0.16.0",
+    "python-multipart>=0.0.9" # Required for FastAPI file uploads
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=8.0.0",
+    "httpx>=0.27.0", # For FastAPI TestClient
+    "ruff>=0.3.0",
+]
+
+[tool.ruff]
+line-length = 100
+target-version = "py310"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B", "SIM"] # Error, Fatal, Isort, PyUpgrade, Bugbear, Simplify
+ignore = []
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["src"]
