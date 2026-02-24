@@ -82,11 +82,9 @@ async def predict_segmentation(
         mask_tensor = engine.predict(input_tensor)
 
         # 4. Reconstruct the output NIfTI preserving original spatial metadata
-        # Assuming the MONAI transform preserved the original affine in the dict metadata
         original_affine = processed_data["image"].meta.get("affine", np.eye(4))
         
-        # Convert PyTorch tensor back to Numpy (D, H, W) -> (W, H, D) depending on original orientation
-        # MONAI outputs channel first. We take the predicted mask and ensure standard NIfTI orientation.
+        # Convert PyTorch tensor to Numpy array (uint8 is enough for classes 0,1,2,3)
         mask_np = mask_tensor.numpy().astype(np.uint8)
         
         output_nifti = nib.Nifti1Image(mask_np, original_affine)

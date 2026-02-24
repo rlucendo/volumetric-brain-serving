@@ -1,0 +1,14 @@
+name: CI/CD Pipeline (Paused)
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  placeholder-job:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Acknowledge setup
+        run: echo "CI/CD will be implemented later. Standing by."
