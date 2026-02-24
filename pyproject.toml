@@ -21,7 +21,8 @@ dependencies = [
     "nibabel>=5.2.0",
     "structlog>=24.1.0",
     "wandb>=0.16.0",
-    "python-multipart>=0.0.9" # Required for FastAPI file uploads
+    "python-multipart>=0.0.9", # Required for FastAPI file uploads
+    "omegaconf>=2.3.0"
 ]
 
 [project.optional-dependencies]

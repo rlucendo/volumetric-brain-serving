@@ -51,12 +51,12 @@ class InferenceEngine:
             channels=(16, 32, 64, 128, 256),
             strides=(2, 2, 2, 2),
             num_res_units=2,
+            norm="batch",
         )
 
     def _load_weights(self, ckpt_path: Path) -> None:
         """
-        Securely loads the checkpoint. Implements the bypass for PyTorch 2.6+
-        to handle OmegaConf dictionaries embedded by PyTorch Lightning.
+        Securely loads the checkpoint. Maps PyTorch Lightning keys to MONAI native keys.
         """
         if not ckpt_path.exists():
             logger.error("Checkpoint not found", path=str(ckpt_path))
@@ -64,16 +64,26 @@ class InferenceEngine:
 
         logger.info("Loading weights into memory", path=str(ckpt_path))
         try:
-            # SECURITY WARNING: weights_only=False is required for PyTorch Lightning + OmegaConf .ckpt files.
-            # Only load checkpoints from trusted sources (like our W&B registry).
             checkpoint = torch.load(ckpt_path, map_location=self.device, weights_only=False)
-            
-            # Lightning checkpoints usually store the model state dict under 'state_dict'.
-            # We might need to strip the 'model.' or 'net.' prefix depending on the LightningModule setup.
             state_dict = checkpoint.get("state_dict", checkpoint)
-            clean_state_dict = {k.replace("model.", ""): v for k, v in state_dict.items()}
             
-            self.model.load_state_dict(clean_state_dict, strict=False)
+            clean_state_dict = {}
+            for k, v in state_dict.items():
+                # Strip all nested prefixes injected by PyTorch Lightning or Custom Modules.
+                # This resolves the "Matryoshka" nesting effect (e.g., 'model.net.model.0.conv...').new_key = k
+                while new_key.startswith("net.") or new_key.startswith("model."):
+                    if new_key.startswith("net."):
+                        new_key = new_key[4:] # Strip 'net.' prefix
+                    elif new_key.startswith("model."):
+                        new_key = new_key[6:] # Strip 'model.' prefix
+                
+                # At this point, new_key is the raw base layer name (e.g., '0.conv.unit0...').
+                # We prepend the strict single 'model.' prefix expected by MONAI's native UNet.
+                final_key = f"model.{new_key}"
+                clean_state_dict[final_key] = v
+            
+            # Use strict=True to guarantee 100% weight matching
+            self.model.load_state_dict(clean_state_dict, strict=True)
             logger.info("Weights loaded successfully")
             
         except Exception as e:
