@@ -12,7 +12,8 @@ from wandb.errors import CommError
 # Assuming we run this from the project root
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
 MODELS_DIR = PROJECT_ROOT / "models"
-DEFAULT_ARTIFACT_PATH = "rlucendo/brats-3d-segmentation/model-326li7z2:v19"  # Update with your actual artifact path
+# Update with your actual artifact path
+DEFAULT_ARTIFACT_PATH = "rlucendo/brats-3d-segmentation/model-326li7z2:v19"
 
 def fetch_model_from_registry(artifact_path: str, output_dir: Path) -> None:
     """
