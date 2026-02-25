@@ -1,4 +1,4 @@
-name: CI/CD Pipeline (Paused)
+name: NeuroSeg-3D CI/CD Pipeline
 
 on:
   push:
@@ -7,8 +7,72 @@ on:
     branches: [ "main" ]
 
 jobs:
-  placeholder-job:
+  # ---------------------------------------------------------
+  # JOB 1: Code Quality & Testing
+  # ---------------------------------------------------------
+  code-quality:
+    name: Lint and Format
     runs-on: ubuntu-latest
     steps:
-      - name: Acknowledge setup
-        run: echo "CI/CD will be implemented later. Standing by."
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.10'
+          
+      - name: Install Linting Tools
+        run: pip install ruff
+        
+      - name: Run Ruff Linter
+        run: ruff check .
+        
+  # ---------------------------------------------------------
+  # JOB 2: Build & Publish Docker Image to GHCR
+  # ---------------------------------------------------------
+  build-and-publish:
+    name: Build and Push Docker Image
+    needs: code-quality # Only runs if code passes the linting stage
+    runs-on: ubuntu-latest
+    
+    # Required permissions to push packages to GitHub Container Registry (GHCR)
+    permissions:
+      contents: read
+      packages: write
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python (for W&B download script)
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.10'
+
+      - name: Install W&B client
+        run: pip install wandb
+
+      - name: Download Model Artifact from W&B
+        env:
+          # GitHub automatically injects the repository secret configured earlier
+          WANDB_API_KEY: ${{ secrets.WANDB_API_KEY }}
+        run: python scripts/download_model.py
+
+      - name: Log in to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }} # Automatically provided by GitHub Actions
+
+      - name: Extract repository name to lowercase
+        # Docker strictly requires repository image names to be lowercase
+        run: echo "REPO_LOWERCASE=$(echo ${{ github.repository }} | tr '[:upper:]' '[:lower:]')" >> $GITHUB_ENV
+
+      - name: Build and push Docker image
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          push: true
+          tags: ghcr.io/${{ env.REPO_LOWERCASE }}-api:latest

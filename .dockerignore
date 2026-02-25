@@ -1,0 +1,24 @@
+# Git and environments
+.git
+.gitignore
+.venv
+venv
+__pycache__
+*.pyc
+
+# Local environment variables
+.env
+.env.*
+
+# Tests and caches
+.pytest_cache
+.ruff_cache
+tests/
+
+# Ignore local models and data to keep the build context small.
+# The model will be injected via the W&B script during the build step.
+# models/
+data/
+predictions/
+*.nii
+*.nii.gz
