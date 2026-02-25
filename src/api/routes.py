@@ -5,6 +5,7 @@ import os
 import tempfile
 import time
 from pathlib import Path
+from typing import Annotated
 
 import nibabel as nib
 import numpy as np
@@ -48,14 +49,17 @@ async def health_check(request: Request) -> HealthResponse:
 async def predict_segmentation(
     request: Request,
     background_tasks: BackgroundTasks,
-    file: UploadFile = File(...)
+    file: Annotated[UploadFile, File(...)],
 ) -> FileResponse:
     """
     Receives a multi-channel 3D NIfTI file, performs sliding window inference,
     and returns the predicted segmentation mask as a new NIfTI file.
     """
     if not file.filename.endswith(".nii.gz") and not file.filename.endswith(".nii"):
-        raise HTTPException(status_code=400, detail="Only NIfTI files (.nii or .nii.gz) are supported.")
+        raise HTTPException(
+            status_code=400,
+            detail="Only NIfTI files (.nii or .nii.gz) are supported."
+        )
 
     logger.info("Received inference request", filename=file.filename)
     start_time = time.time()
@@ -106,4 +110,7 @@ async def predict_segmentation(
         # Ensure cleanup happens even if inference fails
         background_tasks.add_task(cleanup_temp_files, input_path)
         logger.error("Inference pipeline failed", error=str(e))
-        raise HTTPException(status_code=500, detail="Internal server error during processing.") from e
+        raise HTTPException(
+            status_code=500,
+            detail="Internal server error during processing."
+        ) from e

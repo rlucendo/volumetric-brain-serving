@@ -41,7 +41,10 @@ async def lifespan(app: FastAPI):
         logger.info("Application state fully initialized. Ready for traffic.")
         
     except Exception as e:
-        logger.error("CRITICAL FAILURE during startup. Could not initialize ML engines.", error=str(e))
+        logger.error(
+            "CRITICAL FAILURE during startup. Could not initialize ML engines.",
+            error=str(e)
+        )
         raise RuntimeError("Startup failed due to ML engine initialization error.") from e
 
     yield # --- The application runs and serves requests here ---

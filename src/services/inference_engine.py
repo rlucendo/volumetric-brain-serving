@@ -2,9 +2,7 @@
 Core inference engine wrapping the 3D U-Net model.
 Manages GPU/CPU allocation, safe checkpoint loading, and sliding window inference.
 """
-import os
 from pathlib import Path
-from typing import Any
 
 import torch
 from monai.inferers import sliding_window_inference
