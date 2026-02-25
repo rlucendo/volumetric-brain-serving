@@ -70,7 +70,8 @@ class InferenceEngine:
             clean_state_dict = {}
             for k, v in state_dict.items():
                 # Strip all nested prefixes injected by PyTorch Lightning or Custom Modules.
-                # This resolves the "Matryoshka" nesting effect (e.g., 'model.net.model.0.conv...').new_key = k
+                # This resolves the "Matryoshka" nesting effect (e.g., 'model.net.model.0.conv...').
+                new_key = k
                 while new_key.startswith("net.") or new_key.startswith("model."):
                     if new_key.startswith("net."):
                         new_key = new_key[4:] # Strip 'net.' prefix
