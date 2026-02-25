@@ -27,7 +27,7 @@ To guarantee maintainability and scalability, this project strictly adheres to *
 
 ### 2.1. Directory Structure
 
-``text
+```text
 volumetric-brain-serving/
 ├── .github/workflows/
 │   └── ci_cd_pipeline.yml       # GitHub Actions workflow for Linting, Testing, and GHCR Build
@@ -57,7 +57,7 @@ volumetric-brain-serving/
 ├── .dockerignore                # Excludes heavy environments and secrets from the image
 ├── .env.example                 # Template for local development secrets
 └── .gitignore
-``
+```
 
 ### 2.2. The Request Lifecycle (Data Flow)
 
@@ -127,24 +127,24 @@ This project supports two environments: a rapid local development setup (using v
 This setup is ideal for testing code changes, debugging the MONAI pipeline, and running the `pytest` suite without rebuilding the Docker image.
 
 **1. Clone the repository and configure the environment**
-``bash
+```bash
 git clone https://github.com/rlucendo/volumetric-brain-serving.git
 cd volumetric-brain-serving
 
 # Create and activate a virtual environment
 python -m venv .venv
 source .venv/bin/activate  # On Windows use: .venv\Scripts\activate
-``
+```
 
 **2. Install dependencies**
 Install the project in editable mode `[-e]` along with development tools (Ruff, Pytest).
-``bash
+```bash
 pip install -e .[dev]
-``
+```
 
 **3. Fetch the Model Artifact**
 The repository does not store the `.ckpt` file. You must authenticate with W&B to download it securely into the `models/` directory.
-``bash
+```bash
 # Export your W&B API key to your terminal session
 export WANDB_API_KEY="your_personal_api_key_here"
 
@@ -153,13 +153,13 @@ export WANDB_API_KEY="your_personal_api_key_here"
 
 # Execute the secure downloader script
 python scripts/download_model.py
-``
+```
 
 **4. Boot the Server**
 Start the FastAPI server using Uvicorn with live-reloading enabled.
-``bash
+```bash
 uvicorn src.main:app --reload
-``
+```
 *The API is now live at `http://127.0.0.1:8000`. Navigate to `/docs` to upload a sample `.nii.gz` file.*
 
 ---
@@ -173,21 +173,21 @@ The multi-stage `Dockerfile` expects the `last.ckpt` file to be present in the `
 
 **2. Build the Docker Image**
 This process leverages a multi-stage build. It will install the CPU-only version of PyTorch to drastically reduce image size and cloud hosting costs.
-``bash
+```bash
 docker build -t neuroseg-api:latest .
-``
+```
 
 **3. Run the Container**
 Boot the container in detached mode (`-d`), mapping the internal port 8000 to your host machine. The container runs under a secure, non-root user profile.
-``bash
+```bash
 docker run -d -p 8000:8000 --name neuroseg_serving neuroseg-api:latest
-``
+```
 
 **4. Check container health**
-``bash
+```bash
 # View the structured JSON startup logs
 docker logs -f neuroseg_serving
-``
+```
 
 *To stop the container, run `docker stop neuroseg_serving`.*
 
